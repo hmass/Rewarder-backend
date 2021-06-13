@@ -27,7 +27,7 @@ Route::post('reset', 'App\Http\Controllers\ForgotPasswordController@reset');
 Route::get('user', 'App\Http\Controllers\AuthController@user')->middleware('auth:api');
 
 Route::middleware('auth:api')->group( function () {
-
+    Route::post('logout', 'App\Http\Controllers\AuthController@logout');
     // Route::resource('customers', CustomerController::class);
     Route::get('/vouchers/generate', 'App\Http\Controllers\VoucherController@generateVoucher');
     Route::apiResource('customers', 'App\Http\Controllers\CustomerController');

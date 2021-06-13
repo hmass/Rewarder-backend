@@ -12,6 +12,18 @@ use Illuminate\Support\Facades\Hash;
 class AuthController extends Controller
 {
     
+
+    //logout
+    public function logout (Request $request) {
+
+        /**@var User $user */
+        $user = Auth::user();
+        $accessToken = $user->token();
+        $token= $request->user()->tokens->find($accessToken);
+        $token->revoke();
+        return response(['message' => 'You have been successfully logged out.'], 200);
+    }
+
     public function login(LoginRequest $request){
 
         try{
@@ -55,4 +67,6 @@ class AuthController extends Controller
  
 
     }
+
+    
 }

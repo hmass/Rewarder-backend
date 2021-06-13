@@ -2,23 +2,63 @@
 
 namespace App\Http\Controllers;
 
+// use App\Filters\CustomerFilters;
+
+use App\Filters\CustomerFilters;
 use App\Http\Resources\Customer as ResourcesCustomer;
-use App\Http\Resources\CustomerCollection;
+// use App\Http\Resources\CustomerCollection;
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class CustomerController extends Controller
 {
+
+    public const PER_PAGE = 10;
+    public const DEFAULT_SORT_FIELD = 'created_at';
+    public const DEFAULT_SORT_ORDER = 'asc';
+    protected $customer;
+
+    protected array $sortFields = ['name', 'customer_id', 'order_value'];
+    
     /**
-     * Display a listing of the resource.
+     * @param Customer $customer
+     */
+    public function __construct(Customer $customer)
+    {
+        $this->customer = $customer;
+    }
+    
+    /**
+     * Display a listing of the cutomer resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request) : AnonymousResourceCollection
     {
-        $customers = Customer::paginate();
+        $sortFieldInput = $request->input('sort_field', self::DEFAULT_SORT_FIELD);
+
+        $sortField = in_array($sortFieldInput, $this->sortFields) ? $sortFieldInput : self::DEFAULT_SORT_FIELD;
+
+        $sortOrder = $request->input('sort_order', self::DEFAULT_SORT_ORDER);
+
+        $searchInput = $request->input('search');
+
+        $query = $this->customer->orderBy($sortField, $sortOrder);
+        
+        $perPage = $request->input('per_page', self::PER_PAGE);
+
+        if (!is_null($searchInput)) {
+            $searchQuery = "%$searchInput%";
+            $query = $query->where('customer_id', 'like', $searchQuery)->orWhere('name', 'like', $searchQuery)->orWhere('order_value', 'like', $searchQuery)->orWhere('created_at', 'like', $searchQuery);
+            # code...
+        }
+
+
+        $customers = $query->paginate((int)$perPage);
         return ResourcesCustomer::collection($customers);
     }
+
 
     /**
      * Store a newly created resource in storage.

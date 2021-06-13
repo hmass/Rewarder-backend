@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Filters\Filterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Voucher;
@@ -10,6 +11,7 @@ use App\Models\Voucher;
 class Customer extends Model
 {
     use HasFactory;
+    // use Filterable;
         /**
 
      * The attributes that are mass assignable.
